@@ -12,6 +12,8 @@ export const fetchNxbs = async () => {
     nxbs.value = response.data; // Cập nhật danh sách nhà xuất bản
   } catch (error) {
     console.error("Lỗi khi lấy danh sách Nhà Xuất Bản:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -21,6 +23,8 @@ export const updateNxb = async (updatedNxb) => {
     await axios.put(`http://localhost:5000/api/nhaxuatban/edit/${updatedNxb._id}`, updatedNxb); // Đường dẫn API cập nhật nhà xuất bản
   } catch (error) {
     console.error("Lỗi khi cập nhật Nhà Xuất Bản:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -30,6 +34,8 @@ export const addNxb = async (newNxb) => {
     await axios.post("http://localhost:5000/api/nhaxuatban/add", newNxb); // Đường dẫn API thêm nhà xuất bản
   } catch (error) {
     console.error("Lỗi khi thêm Nhà Xuất Bản:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -38,5 +44,7 @@ export const deleteNxb = async (delNxb) => {
       await axios.delete(`http://localhost:5000/api/nhaxuatban/delete/${delNxb._id}`, delNxb); // Đường dẫn API thêm nhà xuất bản
     } catch (error) {
       console.error("Lỗi khi xóa Nhà Xuất Bản:", error);
+      alert(error.response.data.message);
+
     }
   };

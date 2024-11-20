@@ -20,7 +20,7 @@ router.get('/', auth, authorize(['admin']), async (req, res) => {
 router.get('/timkiem/ten', auth, authorize(['admin']), async (req, res) => {
     try {
         const { Ten } = req.query;
-        const ketQua = await NhanVien.find({ Ten: { $regex: Ten, $options: 'i' } });
+        const ketQua = await NhanVien.find({ Ten: { $regex: Ten } });
         res.json(ketQua);
     } catch (error) {
         res.status(500).json({ message: 'Lỗi khi tìm nhân viên theo tên' });

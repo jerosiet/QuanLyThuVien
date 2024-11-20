@@ -10,6 +10,8 @@ export const fetchDocGias = async () => {
     docgias.value = response.data;
   } catch (error) {
     console.error("Error fetching docgias:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -20,16 +22,20 @@ export const addDocGia = async (newDocGia) => {
     await fetchDocGias();
   } catch (error) {
     console.error("Error adding docgia:", error);
+    alert(error.response.data.message);
+
   }
 };
 
 // Hàm cập nhật thông tin độc giả
-export const updateDocGia = async (updatedDocGia) => {
+export const updateDocGia = async (updatedDocGia, formvalue) => {
   try {
-    await axios.put(`http://localhost:5000/api/docgia/edit/${updatedDocGia._id}`, updatedDocGia);
+    await axios.put(`http://localhost:5000/api/docgia/edit/${updatedDocGia._id}`, formvalue);
     await fetchDocGias();
   } catch (error) {
     console.error("Error updating docgia:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -40,5 +46,7 @@ export const deleteDocGia = async (id) => {
     await fetchDocGias();
   } catch (error) {
     console.error("Error deleting docgia:", error);
+    alert(error.response.data.message);
+
   }
 };

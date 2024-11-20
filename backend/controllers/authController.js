@@ -9,13 +9,20 @@ exports.register = async (req, res) => {
 
         // Kiểm tra nếu số điện thoại đã tồn tại
         const existingUser = await DocGia.findOne({ SoDienThoai });
-        if (existingUser) {
+        const existingAdmin = await NhanVien.findOne({ SoDienThoai });
+
+        if (existingUser || existingAdmin) {
             return res.status(400).json({ message: 'Số điện thoại đã được sử dụng' });
         }
-
+        if (Phai!== 'Nam' && Phai!== 'Nữ') {
+            return res.status(400).json({ message: 'Phái phải là Nam hoặc Nữ' });
+        }
+        const minDate = new Date("1924-01-01");
+        if (new Date(NgaySinh) <= minDate) {
+            return res.status(400).json({ message: 'Ngày sinh phải lớn hơn 1920' });
+        }
         // Mã hóa mật khẩu
         const hashedPassword = await bcrypt.hash(Password, 10);
-
         // Tạo độc giả mới
         const newDocGia = new DocGia({
             HoLot,

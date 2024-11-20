@@ -43,7 +43,7 @@
           <label>Phái:
             <select v-model="editDocGia.Phai" required>
               <option value="Nam">Nam</option>
-              <option value="Nu">Nữ</option>
+              <option value="Nữ">Nữ</option>
             </select>
           </label>
           <label>Địa Chỉ: <input v-model="editDocGia.DiaChi" type="text" required /></label>
@@ -65,7 +65,7 @@
           <label>Phái:
             <select v-model="newDocGia.Phai" required>
               <option value="Nam">Nam</option>
-              <option value="Nu">Nữ</option>
+              <option value="Nữ">Nữ</option>
             </select>
           </label>
           <label>Địa Chỉ: <input v-model="newDocGia.DiaChi" type="text" required /></label>
@@ -90,7 +90,7 @@ const newDocGia = ref({
   HoLot: "",
   Ten: "",
   NgaySinh: "",
-  Phai: "Nam",
+  Phai: "",
   DiaChi: "",
   SoDienThoai: "",
   Password: ""

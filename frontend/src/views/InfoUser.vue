@@ -8,7 +8,9 @@
         </div>
         <div class="nav-links">
           <RouterLink to="/user-home" class="nav-link">Trang chủ</RouterLink>
-          <RouterLink to="/don-muon-sach" class="nav-link">Đơn mượn sách</RouterLink>
+          <RouterLink to="/don-muon-sach" class="nav-link"
+            >Đơn mượn sách</RouterLink
+          >
           <a class="user-info" @click="toggleDropdown">
             Xin chào, {{ authStore.user?.Ten }}
             <div v-if="showDropdown" class="dropdown">
@@ -22,208 +24,291 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <div>
-          <h1>Thông Tin Tài Khoản</h1>
-          <div>
-            <p><strong>Họ lót:</strong> {{ authStore.user?.HoLot }}</p>
-            <p><strong>Tên:</strong> {{ authStore.user?.Ten }}</p>
-            <p><strong>Ngày sinh:</strong> {{ formatDate(authStore.user?.NgaySinh) }}</p>
-            <p><strong>Phái:</strong> {{ authStore.user?.Phai }}</p>
-            <p><strong>Địa chỉ:</strong> {{ authStore.user?.DiaChi }}</p>
-            <p><strong>Số Điện Thoại:</strong> {{ authStore.user?.SoDienThoai }}</p>
+      <div class="account-card">
+        <h1 class="section-title">Thông Tin Tài Khoản</h1>
+        <form @submit.prevent="handleSave">
+          <div class="info-grid">
+            <div class="info-item">
+              <label for="HoLot">Họ lót:</label>
+              <input
+                id="HoLot"
+                v-model="editForm.HoLot"
+                :disabled="!isEditing"
+              />
+            </div>
+            <div class="info-item">
+              <label for="Ten">Tên:</label>
+              <input
+                id="Ten"
+                v-model="editForm.Ten"
+                :disabled="!isEditing"
+              />
+            </div>
+            <div class="info-item">
+              <label for="NgaySinh">Ngày sinh:</label>
+              <input
+                id="NgaySinh"
+                v-model="editForm.NgaySinh"
+                type="date"
+                :disabled="!isEditing"
+              />
+            </div>
+            <div class="info-item">
+              <label for="Phai">Phái:</label>
+              <input
+                id="Phai"
+                v-model="editForm.Phai"
+                :disabled="!isEditing"
+              />
+            </div>
+            <div class="info-item">
+              <label for="DiaChi">Địa chỉ:</label>
+              <input
+                id="DiaChi"
+                v-model="editForm.DiaChi"
+                :disabled="!isEditing"
+              />
+            </div>
+            <div class="info-item">
+              <label for="SoDienThoai">Số Điện Thoại:</label>
+              <input
+                id="SoDienThoai"
+                v-model="editForm.SoDienThoai"
+                :disabled="!isEditing"
+              />
+            </div>
           </div>
-        </div>
+          <div class="action-buttons">
+            <button
+              v-if="!isEditing"
+              @click.prevent="enableEditing"
+            >
+              Chỉnh sửa
+            </button>
+            <button v-else type="submit" class="action-buttons">Lưu</button>
+            <button
+              v-if="isEditing"
+              @click.prevent="cancelEditing"
+              class="action-buttons"
+            >
+              Hủy
+            </button>
+          </div>
+        </form>
+      </div>
     </main>
   </div>
-  </template>
-  
-  <script setup>
-  import { ref } from "vue";
-  import { useAuthStore } from "../stores/auth";
-  import { useRouter } from "vue-router";
-  
-  // Initializing the stores and router
-  const authStore = useAuthStore();
-  const router = useRouter();
-  
-  // Dropdown visibility state
-  const showDropdown = ref(false);
-  
-  const goToUserInfo = () => {
-      router.push("/info-user");
-  };
+</template>
 
-  const formatDate = (date) => {
+<script setup>
+import { ref } from "vue";
+import { useAuthStore } from "../stores/auth";
+import { useRouter } from "vue-router";
+import { updateDocGia } from "@/stores/docgia";
+
+// Initializing the stores and router
+const authStore = useAuthStore();
+const router = useRouter();
+
+// Dropdown visibility state
+const showDropdown = ref(false);
+
+const goToUserInfo = () => {
+  router.push("/info-user");
+};
+
+const formatDate = (date) => {
   return date ? new Date(date).toISOString().split("T")[0] : "";
 };
-  
-  // Function to toggle the dropdown menu
-  const toggleDropdown = () => {
-    showDropdown.value = !showDropdown.value;
+
+// Trạng thái chỉnh sửa
+const isEditing = ref(false);
+
+// Form chỉnh sửa (bắt đầu với dữ liệu của người dùng)
+const editForm = ref({
+  HoLot: authStore.user?.HoLot || "",
+  Ten: authStore.user?.Ten || "",
+  NgaySinh: formatDate(authStore.user?.NgaySinh) || "",
+  Phai: authStore.user?.Phai || "",
+  DiaChi: authStore.user?.DiaChi || "",
+  SoDienThoai: authStore.user?.SoDienThoai || "",
+});
+
+// Bật chế độ chỉnh sửa
+const enableEditing = () => {
+  isEditing.value = true;
+};
+
+// Hủy chỉnh sửa
+const cancelEditing = () => {
+  isEditing.value = false;
+  editForm.value = {
+    HoLot: authStore.user?.HoLot || "",
+    Ten: authStore.user?.Ten || "",
+    NgaySinh: formatDate(authStore.user?.NgaySinh) || "",
+    Phai: authStore.user?.Phai || "",
+    DiaChi: authStore.user?.DiaChi || "",
+    SoDienThoai: authStore.user?.SoDienThoai || "",
   };
-  
-  // Function to handle logout and redirect
-  const logout = () => {
-    authStore.logout();
-    router.push("/");
-  };
-  </script>
-  
-  <style>
-  .container {
-    background-color: #f7fafc;
-    min-height: 100vh;
+};
+
+// Lưu thông tin
+const handleSave = async () => {
+  try {
+    await updateDocGia(authStore.user, editForm.value);
+    alert("Cập nhật thông tin thành công!");
+    authStore.user = { ...authStore.user, ...editForm.value }; // Cập nhật lại thông tin người dùng trong store
+    isEditing.value = false;
+  } catch (error) {
+    console.error("Lỗi khi cập nhật thông tin:", error);
+    alert("Có lỗi xảy ra khi cập nhật thông tin.");
   }
-  .navbar {
-    background-color: #000000;
-    color: white;
-    padding: 1rem;
-  }
-  .nav-content {
-    display: flex;
-    justify-content: space-between;
-    max-width: 1024px;
-    margin: 0 auto;
-  }
-  .nav-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  .nav-links a {
-    color: white;
-    margin-left: 1rem;
-    text-decoration: none;
-    font-size: 0.875rem;
-  }
-  .nav-links a:hover {
-    background-color: #3869ca;
-    padding: 0.5rem;
-    border-radius: 0.375rem;
-  }
-  .main-content {
-    max-width: 1024px;
-    margin: 2rem auto;
-    padding: 1rem;
-  }
-  .section-title {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  }
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-  .stat-box {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  .stat-name {
-    font-size: 0.875rem;
-    color: #6b7280;
-  }
-  .stat-value {
-    font-size: 1.875rem;
-    font-weight: bold;
-    color: #1f2937;
-  }
-  .section {
-    margin-top: 2rem;
-  }
-  .table-container {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  .table th,
-  .table td {
-    padding: 0.95rem;
-    text-align: left;
-  }
-  .table thead {
-    background-color: #f9fafb;
-  }
-  .table tbody tr:nth-child(even) {
-    background-color: #f3f4f6;
-  }
-  .edit-link {
-    color: #4f46e5;
-    margin-right: 0.5rem;
-  }
-  .edit-link:hover {
-    color: #3730a3;
-  }
-  .delete-link {
-    color: #e11d48;
-  }
-  .delete-link:hover {
-    color: #9f1239;
-  }
-  .status-returned {
-    background-color: #d1fae5;
-    color: #065f46;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
-    font-size: 0.75rem;
-  }
-  .status-pending {
-    background-color: #fef3c7;
-    color: #92400e;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
-    font-size: 0.75rem;
-  }
-  .manage-link {
-    color: #4f46e5;
-  }
-  .manage-link:hover {
-    color: #3730a3;
-  }
-  
-  .user-info {
-    position: relative;
-    cursor: pointer;
-  }
-  
-  .dropdown {
-    position: absolute;
-    right: 0;
-    top: 30px;
-    background-color: white;
-    color: black;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 150px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    padding: 10px 0;
-  }
-  
-  .dropdown p {
-    margin: 0;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .dropdown button {
-    width: 100%;
-    background-color: transparent;
-    color: #333;
-    padding: 10px;
-    cursor: pointer;
-    border: none;
-  }
-  
-  .dropdown button:hover {
-    background-color: #f0f0f0;
-  }
-  </style>
-  
+};
+
+// Function to toggle the dropdown menu
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value;
+};
+
+// Function to handle logout and redirect
+const logout = () => {
+  authStore.logout();
+  router.push("/");
+};
+</script>
+
+<style scoped>
+.container {
+  background-color: #f7fafc;
+  min-height: 100vh;
+}
+
+/* Navbar styling */
+.navbar {
+  background-color: #000000;
+  color: white;
+  padding: 1rem;
+}
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1024px;
+  margin: 0 auto;
+}
+.nav-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.nav-links a {
+  color: white;
+  margin-left: 1rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+.nav-links a:hover {
+  background-color: #3869ca;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+}
+
+/* Dropdown menu */
+.user-info {
+  position: relative;
+  cursor: pointer;
+}
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background-color: white;
+  color: black;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 150px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  padding: 10px 0;
+}
+.dropdown button {
+  width: 100%;
+  background-color: transparent;
+  color: #333;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+}
+.dropdown button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Main content */
+.main-content {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Account card styling */
+.account-card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-item label {
+  flex: 1;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.info-item input {
+  flex: 2;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+button {
+  background-color: #4f46e5;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #3730a3;
+}
+</style>

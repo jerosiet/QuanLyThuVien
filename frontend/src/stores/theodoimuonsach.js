@@ -21,6 +21,8 @@ export const approveRequest = async (id) => {
     alert("Đơn mượn sách đã được duyệt");
   } catch (error) {
     console.error("Error approving request:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -30,6 +32,8 @@ export const markReturned = async (id) => {
     alert("Đơn mượn sách đã được cập nhật thành 'Đã trả'");
   } catch (error) {
     console.error("Error marking as returned:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -39,6 +43,8 @@ export const deleteRecord = async (id) => {
     alert("Đơn mượn sách đã được xóa");
   } catch (error) {
     console.error("Error deleting record:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -79,7 +85,7 @@ export const addRequest = async (newRequest) => {
       return;
     }
     console.error("Error adding request:", error);
-    alert("Có lỗi xảy ra khi thêm đơn mượn sách");
+    alert(error.response.data.message);
   }
 };
 
@@ -91,5 +97,6 @@ export const updateRequest = async (id, requestData) => {
       alert("Thông tin đơn mượn sách đã được cập nhật thành công");
   } catch (error) {
       console.error("Error updating request:", error);
+      alert(error.response.data.message);
   }
 };

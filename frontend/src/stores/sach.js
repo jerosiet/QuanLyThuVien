@@ -12,6 +12,7 @@ export const fetchBooks = async () => {
   } catch (err) {
     console.error('Error fetching books:', err);
     error.value = 'Failed to load books';
+
   }
 };
 
@@ -20,6 +21,8 @@ export const updateBook = async (updatedBook) => {
     await axios.put(`http://localhost:5000/api/sach/edit/${updatedBook._id}`, updatedBook);
   } catch (error) {
     console.error('Error updating book:', error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -29,6 +32,8 @@ export const addBook = async (newBook) => {
     books.value.push(response.data); // Cập nhật danh sách sách với sách mới
   } catch (error) {
     console.error("Error adding book:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -37,6 +42,8 @@ export const deleteBook = async (delBook) => {
     await axios.delete(`http://localhost:5000/api/sach/delete/${delBook._id}`, delBook); // Đường dẫn API thêm nhà xuất bản
   } catch (error) {
     console.error("Lỗi khi xóa Sách:", error);
+    alert(error.response.data.message);
+
   }
 };
 

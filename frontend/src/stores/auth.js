@@ -32,6 +32,7 @@ export const useAuthStore = defineStore("auth", {
         console.log("User updated:", this.user);
       } catch (error) {
         console.error("Lỗi đăng nhập:", error);
+        alert(error.response.data.message);
       }
     },
 
@@ -42,6 +43,7 @@ export const useAuthStore = defineStore("auth", {
         await this.login({ SoDienThoai: data.SoDienThoai, Password: data.Password });
       } catch (error) {
         console.error("Lỗi đăng ký:", error);
+        alert(error.response.data.message);
       }
     },
 
@@ -71,6 +73,7 @@ export const useAuthStore = defineStore("auth", {
         } catch (error) {
           console.error("Lỗi khi lấy thông tin người dùng:", error);
           this.logout(); // Xóa token nếu không hợp lệ và chuyển hướng đăng nhập
+          alert(error.response.data.message);
         }
       }
     }

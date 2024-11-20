@@ -10,6 +10,8 @@ export const fetchnhanviens = async () => {
     nhanviens.value = response.data;
   } catch (error) {
     console.error("Error fetching nhanviens:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -20,16 +22,20 @@ export const addnhanvien = async (newnhanvien) => {
     await fetchnhanviens();
   } catch (error) {
     console.error("Error adding nhanvien:", error);
+    alert(error.response.data.message);
+
   }
 };
 
 // Hàm cập nhật thông tin nhân viên
-export const updatenhanvien = async (updatednhanvien) => {
+export const updatenhanvien = async (updatednhanvien, formvalue) => {
   try {
-    await axios.put(`http://localhost:5000/api/nhanvien/edit/${updatednhanvien._id}`, updatednhanvien);
+    await axios.put(`http://localhost:5000/api/nhanvien/edit/${updatednhanvien._id}`, formvalue);
     await fetchnhanviens();
   } catch (error) {
     console.error("Error updating nhanvien:", error);
+    alert(error.response.data.message);
+
   }
 };
 
@@ -50,5 +56,7 @@ export const deletenhanvien = async (id) => {
     await fetchnhanviens();
   } catch (error) {
     console.error("Error deleting nhanvien:", error);
+    alert(error.response.data.message);
+
   }
 };

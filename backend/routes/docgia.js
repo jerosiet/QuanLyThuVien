@@ -21,7 +21,7 @@ router.get('/', auth, authorize(['admin', 'user']), async (req, res) => {
 router.get('/timkiem/ten', auth, authorize(['admin', 'user']), async (req, res) => {
     try {
         const { Ten } = req.query;
-        const ketQua = await DocGia.find({ Ten: { $regex: Ten, $options: 'i' } });
+        const ketQua = await DocGia.find({ Ten:  Ten });
         res.json(ketQua);
     } catch (error) {
         res.status(500).json({ message: 'Lỗi khi tìm độc giả theo tên' });

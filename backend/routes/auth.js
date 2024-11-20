@@ -23,7 +23,7 @@ router.get('/me', auth, async (req, res) => {
         res.json({ user });
     } catch (error) {
         console.error("Lỗi khi lấy thông tin người dùng:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: error.message });
     }
 });
 
