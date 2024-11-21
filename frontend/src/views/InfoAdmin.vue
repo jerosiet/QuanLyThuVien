@@ -4,19 +4,17 @@
     <nav class="navbar">
       <div class="nav-content">
         <div class="nav-left">
-          <span class="nav-title">Library Admin</span>
+          <span class="nav-title">Library</span>
         </div>
         <div class="nav-links">
-          <RouterLink to="/admin-home" class="nav-link">Trang chủ</RouterLink>
-          <RouterLink to="/quan-ly-sach" class="nav-link">Quản lý Sách</RouterLink>
-          <RouterLink to="/quan-ly-doc-gia" class="nav-link">Quản lý Độc giả</RouterLink>
-          <RouterLink to="/quan-ly-muon-sach" class="nav-link">Quản lý Mượn sách</RouterLink>
-          <RouterLink to="/quan-ly-nxb" class="nav-link">Quản lý NXB</RouterLink>
-          <RouterLink to="/quan-ly-nhan-vien" class="nav-link">Quản lý Nhân viên</RouterLink>
+          <RouterLink to="/user-home" class="nav-link">Trang chủ</RouterLink>
+          <RouterLink to="/don-muon-sach" class="nav-link"
+            >Đơn mượn sách</RouterLink
+          >
           <a class="user-info" @click="toggleDropdown">
-            Xin chào, {{ authStore.user?.HoTenNV }}
+            Xin chào, {{ authStore.user?.Ten }}
             <div v-if="showDropdown" class="dropdown">
-              <button @click.prevent="goToAdminInfo">Thông tin tài khoản</button>
+              <button @click.prevent="goToUserInfo">Thông tin tài khoản</button>
               <button @click="logout">Đăng xuất</button>
             </div>
           </a>
@@ -31,26 +29,61 @@
         <form @submit.prevent="handleSave">
           <div class="info-grid">
             <div class="info-item">
-              <label>Họ và tên:</label>
-              <input v-model="editInfo.HoTenNV" :disabled="!isEditing" />
+              <label for="HoTenNV">Họ tên Nhân viên:</label>
+              <input
+                id="HoTenNV"
+                v-model="editForm.HoTenNV"
+                :disabled="!isEditing"
+              />
             </div>
             <div class="info-item">
-              <label>Số Điện Thoại:</label>
-              <input v-model="editInfo.SoDienThoai" :disabled="!isEditing" />
+              <label for="ChucVu">Chức vụ:</label>
+              <input
+                id="ChucVu"
+                v-model="editForm.ChucVu"
+                :disabled="!isEditing"
+              />
             </div>
             <div class="info-item">
-              <label>Chức vụ:</label>
-              <input v-model="editInfo.ChucVu" :disabled="!isEditing" />
+              <label for="DiaChi">Địa chỉ:</label>
+              <input
+                id="DiaChi"
+                v-model="editForm.DiaChi"
+                :disabled="!isEditing"
+              />
             </div>
             <div class="info-item">
-              <label>Địa chỉ:</label>
-              <input v-model="editInfo.DiaChi" :disabled="!isEditing" />
+              <label for="SoDienThoai">Số Điện Thoại:</label>
+              <input
+                id="SoDienThoai"
+                v-model="editForm.SoDienThoai"
+                :disabled="!isEditing"
+              />
+            </div>
+            <div class="info-item">
+              <label for="Password">Đổi mật khẩu:</label>
+              <input type="password"
+                id="Password"
+                v-model="editForm.Password"
+                :disabled="!isEditing"
+              />
             </div>
           </div>
           <div class="action-buttons">
-            <button v-if="!isEditing" @click.prevent="toggleEdit">Chỉnh sửa</button>
-            <button v-else type="submit">Lưu</button>
-            <button v-if="isEditing" @click.prevent="cancelEdit">Hủy</button>
+            <button
+              v-if="!isEditing"
+              @click.prevent="enableEditing"
+            >
+              Chỉnh sửa
+            </button>
+            <button v-else type="submit" class="action-buttons">Lưu</button>
+            <button
+              v-if="isEditing"
+              @click.prevent="cancelEditing"
+              class="action-buttons"
+            >
+              Hủy
+            </button>
           </div>
         </form>
       </div>
@@ -62,57 +95,67 @@
 import { ref } from "vue";
 import { useAuthStore } from "../stores/auth";
 import { useRouter } from "vue-router";
-import { updatenhanvien } from "@/stores/nhanvien"; // API cập nhật thông tin admin
+import { updatenhanvien } from "@/stores/nhanvien";
 
 // Initializing the stores and router
 const authStore = useAuthStore();
 const router = useRouter();
 
-// State for dropdown visibility
+// Dropdown visibility state
 const showDropdown = ref(false);
 
-// State for editing mode
+const goToUserInfo = () => {
+  router.push("/info-user");
+};
+
+// Trạng thái chỉnh sửa
 const isEditing = ref(false);
 
-// Clone the initial user info for editing
-const editInfo = ref({ ...authStore.user });
+// Form chỉnh sửa (bắt đầu với dữ liệu của người dùng)
+const editForm = ref({
+  HoTenNV: authStore.user?.HoTenNV || "",
+  ChucVu: authStore.user?.ChucVu || "",
+  DiaChi: authStore.user?.DiaChi || "",
+  SoDienThoai: authStore.user?.SoDienThoai || "",
+  Password: "",
+});
 
-// Toggle between view and edit mode
-const toggleEdit = () => {
+// Bật chế độ chỉnh sửa
+const enableEditing = () => {
   isEditing.value = true;
 };
 
-// Cancel edit and reset the form
-const cancelEdit = () => {
-  editInfo.value = { ...authStore.user };
+// Hủy chỉnh sửa
+const cancelEditing = () => {
   isEditing.value = false;
+  editForm.value = {
+    HoTenNV: authStore.user?.HoTenNV || "",
+    ChucVu: authStore.user?.ChucVu || "",
+    DiaChi: authStore.user?.DiaChi || "",
+    SoDienThoai: authStore.user?.SoDienThoai || "",
+    Password: "",
+  };
 };
 
-// Save the updated information
+// Lưu thông tin
 const handleSave = async () => {
   try {
-    await updatenhanvien(authStore.user, editInfo.value);
-    // Update the user info in the store
-    authStore.user = { ...editInfo.value };
+    await updatenhanvien(authStore.user, editForm.value);
+    alert("Cập nhật thông tin thành công!");
+    authStore.user = { ...authStore.user, ...editForm.value }; // Cập nhật lại thông tin người dùng trong store
     isEditing.value = false;
-    alert("Thông tin đã được cập nhật!");
   } catch (error) {
     console.error("Lỗi khi cập nhật thông tin:", error);
-    alert("Cập nhật thất bại!");
+    alert("Có lỗi xảy ra khi cập nhật thông tin.");
   }
 };
 
-// Dropdown menu toggle
+// Function to toggle the dropdown menu
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value;
 };
 
-// Redirect to admin info
-const goToAdminInfo = () => {
-  router.push("/info-admin");
-};
-
-// Logout
+// Function to handle logout and redirect
 const logout = () => {
   authStore.logout();
   router.push("/");
@@ -120,7 +163,6 @@ const logout = () => {
 </script>
 
 <style scoped>
-/* Main container */
 .container {
   background-color: #f7fafc;
   min-height: 100vh;

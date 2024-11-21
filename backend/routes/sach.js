@@ -5,6 +5,7 @@ const auth = require('../middleware/auth');
 const Sach = require('../models/Sach');
 const authorize = require('../middleware/authorize');
 const NhaXuatBan = require("../models/NhaXuatBan");
+const TheoDoiMuonSach = require("../models/TheoDoiMuonSach");
 
 
 // Liệt kê tất cả các sách
@@ -122,14 +123,27 @@ router.put('/edit/:id', auth, authorize(['admin']), async (req, res) => {
 router.delete('/delete/:id', auth, authorize(['admin']), async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Kiểm tra xem sách có đang được mượn không
+        const isBookBorrowed = await TheoDoiMuonSach.find({ id });
+        if (isBookBorrowed) {
+            return res.status(400).json({
+                message: 'Không thể xóa sách vì sách đang được mượn',
+            });
+        }
+
+        // Xóa sách nếu không có ràng buộc
         const sachXoa = await Sach.findByIdAndDelete(id);
         if (!sachXoa) {
             return res.status(404).json({ message: 'Không tìm thấy sách' });
         }
+
         res.json({ message: 'Sách đã được xóa' });
     } catch (error) {
+        console.error('Error deleting book:', error);
         res.status(500).json({ message: 'Lỗi khi xóa sách' });
     }
 });
+
 
 module.exports = router;

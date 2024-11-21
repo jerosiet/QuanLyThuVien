@@ -63,7 +63,16 @@ router.post('/add', auth, authorize(['admin']), async (req, res) => {
 router.put('/edit/:id', auth, authorize(['admin']), async (req, res) => {
     try {
         const { id } = req.params;
-        const NhanVienCapNhat = await NhanVien.findByIdAndUpdate(id, req.body, { new: true });
+        const { Password, ...otherFields } = req.body; // Tách riêng Password để xử lý riêng
+
+        let updatedFields = { ...otherFields };
+
+        // Kiểm tra nếu Password được gửi và không rỗng
+        if (Password && Password.trim() !== "") {
+            const hashedPassword = await bcrypt.hash(Password, 10);
+            updatedFields.Password = hashedPassword; // Gắn mật khẩu đã băm vào updatedFields
+        }
+        const NhanVienCapNhat = await NhanVien.findByIdAndUpdate(id, updatedFields, { new: true });
         res.json({ message: 'Thông tin nhân viên đã được cập nhật', NhanVien: NhanVienCapNhat });
     } catch (error) {
         res.status(500).json({ message: 'Lỗi khi cập nhật nhân viên' });

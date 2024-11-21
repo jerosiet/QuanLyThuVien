@@ -4,6 +4,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const NhaXuatBan = require('../models/NhaXuatBan');
 const authorize = require('../middleware/authorize');
+const Sach = require('../models/Sach');
 
 // Liệt kê danh sách nhà xuất bản
 router.get('/', auth, authorize(['admin', 'user']), async (req, res) => {
@@ -41,11 +42,27 @@ router.put('/edit/:id', auth, authorize(['admin']), async (req, res) => {
 router.delete('/delete/:id', auth, authorize(['admin']), async (req, res) => {
     try {
         const { id } = req.params;
-        await NhaXuatBan.findByIdAndDelete(id);
-        res.json({ message: 'Nhà xuất bản đã được xóa' });
+
+        // Kiểm tra xem NXB có sách nào liên quan không
+        const isPublisherUsed = await Sach.find({ id });
+        if (isPublisherUsed) {
+            return res.status(400).json({
+                message: 'Không thể xóa Nhà Xuất Bản vì đang có sách thuộc NXB này',
+            });
+        }
+
+        // Xóa NXB nếu không có sách liên quan
+        const nxbXoa = await NhaXuatBan.findByIdAndDelete(id);
+        if (!nxbXoa) {
+            return res.status(404).json({ message: 'Không tìm thấy Nhà Xuất Bản' });
+        }
+
+        res.json({ message: 'Nhà Xuất Bản đã được xóa' });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi xóa nhà xuất bản' });
+        console.error('Error deleting publisher:', error);
+        res.status(500).json({ message: 'Lỗi khi xóa Nhà Xuất Bản' });
     }
 });
+
 
 module.exports = router;

@@ -74,7 +74,7 @@ exports.login = async (req, res) => {
         // Kiểm tra mật khẩu
         const isMatch = await bcrypt.compare(Password, user.Password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Mật khẩu không đúng' });
+            return res.status(500).json({ message: 'Mật khẩu không đúng' });
         }
 
         // Tạo token với vai trò người dùng

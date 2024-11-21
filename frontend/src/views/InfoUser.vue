@@ -77,6 +77,14 @@
                 :disabled="!isEditing"
               />
             </div>
+            <div class="info-item">
+              <label for="Password">Đổi mật khẩu:</label>
+              <input type="password"
+                id="Password"
+                v-model="editForm.Password"
+                :disabled="!isEditing"
+              />
+            </div>
           </div>
           <div class="action-buttons">
             <button
@@ -132,6 +140,7 @@ const editForm = ref({
   Phai: authStore.user?.Phai || "",
   DiaChi: authStore.user?.DiaChi || "",
   SoDienThoai: authStore.user?.SoDienThoai || "",
+  Password: "",
 });
 
 // Bật chế độ chỉnh sửa
@@ -149,6 +158,7 @@ const cancelEditing = () => {
     Phai: authStore.user?.Phai || "",
     DiaChi: authStore.user?.DiaChi || "",
     SoDienThoai: authStore.user?.SoDienThoai || "",
+    Password: "",
   };
 };
 
